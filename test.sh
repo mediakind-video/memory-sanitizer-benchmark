@@ -204,6 +204,11 @@ function run_all_inspector_tests()
         args+=(-knob analyze-stack=true)
     fi
 
+    if [[ -f "$script_dir/suppressions-$version.txt" ]]
+    then
+        args+=(-suppression-file "$script_dir/suppressions-$version.txt")
+    fi
+
     echo "Inspector $version"
     (
         echo "== Inspector $version =="
