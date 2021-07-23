@@ -209,6 +209,7 @@ function run_all_inspector_tests()
         echo "== Inspector $version =="
         run_tests inspector-"$version" "$inspector" \
                   -collect "$inspector_analysis" \
+                  -result-dir "$log_dir/r$version-@@@{at}" \
                   "${args[@]}" \
 
     ) > "$log_dir/inspector-$version.log"
