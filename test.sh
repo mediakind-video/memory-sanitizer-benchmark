@@ -159,7 +159,22 @@ function run_tests()
     local end
     end="$(date +%s)"
 
-    echo "Done in $(date --date=@$((end - start)) "+%M m. %S s.")"
+    local total_seconds=$((end - start))
+    local seconds=$((total_seconds % 60))
+    local minutes=$((total_seconds / 60 % 60))
+    local hours=$((total_seconds / 3600))
+
+    printf "Done in "
+
+    if [[ "$hours" -ne 0 ]]
+    then
+        printf "%s h. %s m. %s s.\n" "$hours" "$minutes" "$seconds"
+    elif [[ "$minutes" -ne 0 ]]
+    then
+        printf "%s m. %s s.\n" "$minutes" "$seconds"
+    else
+        printf "%s s.\n" "$seconds"
+    fi
 }
 
 function run_all_inspector_tests()
@@ -303,7 +318,7 @@ do
     esac
 done
 
-if [ -n "$run_inspector_only" ]
+if [[ -n "$run_inspector_only" ]]
 then
     # This case should only occur from a recursive instantiation, thus
     # we can assume that the setup is done.
