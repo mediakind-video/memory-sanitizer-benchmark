@@ -11,8 +11,14 @@ run_inspector_version[2017]=1
 run_inspector_version[2018]=1
 run_inspector_version[2019]=1
 run_inspector_version[2020]=1
-log_dir="$(pwd)/logs"
+
 intel_root="$HOME/intel"
+
+working_directory="$(pwd)"
+log_dir="$working_directory/logs"
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
+this_script="${script_dir}/$(basename "${BASH_SOURCE[0]}")"
 
 function usage()
 {
@@ -226,10 +232,23 @@ function run_all_tests()
 
     if [[ "$run_inspector" -ne 0 ]]
     then
-        for version in 2016 2017 2018 2019 2020
-        do
-            run_all_inspector_tests $version
-        done
+        pids=()
+        (
+            # Need to switch to the working directory for the log directory to
+            # be correctly set by the recursive instantiation.
+            cd "$working_directory"
+
+            for version in 2016 2017 2018 2019 2020
+            do
+                "$this_script" --inspector-"$version" &
+                pids+=($!)
+            done
+
+            for p in "${pids[@]}"
+            do
+                wait "$p"
+            done
+        )
     fi
 
     cd - > /dev/null
@@ -257,6 +276,11 @@ do
         --skip-valgrind)
             run_valgrind=0
             ;;
+        --inspector-*)
+            cd "$script_dir/build/default"
+            run_all_inspector_tests "${arg#--inspector-}"
+            exit
+            ;;
         *)
             echo "Unhandled argument: '$arg'." >&2
             exit 1
@@ -265,7 +289,6 @@ done
 
 mkdir -p "$log_dir"
 
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 cd "$script_dir/build"
 
 run_all_tests
