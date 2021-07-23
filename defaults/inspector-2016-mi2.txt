@@ -1,0 +1,14 @@
+detect-uninit-read
+  Default value: false
+revert-uninit
+  Default value: false
+detect-leaks-on-exit
+  Default value: true
+enable-memory-growth-detection
+  Default value: true
+enable-on-demand-leak-detection
+  Default value: true
+still-allocated-memory
+  Default value: true
+stack-depth
+  Default value: 8
