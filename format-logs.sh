@@ -25,9 +25,15 @@ function pretty_format()
 
     local red="${escape}[31m"
     local green="${escape}[32m"
+    local gray="${escape}[37m"
     local reset="${escape}[0m"
 
-    sed "s/\t0/\tN/g;s/\t1/\tY/g;s/N/${red}✖${reset}/g;s/Y/${green}✔${reset}/g"
+    sed "s/\t0/\tN/g
+         s/\t1/\tY/g
+         s/\t2/\tF/g
+         s/N/${red}✖${reset}/g
+         s/Y/${green}✔${reset}/g
+         s/F/${gray}☠${reset}/g"
 }
 
 if [ -t 1 ]
@@ -41,7 +47,7 @@ fi
     if [ $# -eq 0 ]
     then
         script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
-        cat "$script_dir"/logs/*.log
+        cat "$script_dir"/logs-mi2/*.log
     else
         cat "$@"
     fi

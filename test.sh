@@ -11,11 +11,12 @@ run_inspector_version[2017]=1
 run_inspector_version[2018]=1
 run_inspector_version[2019]=1
 run_inspector_version[2020]=1
+inspector_analysis=mi2
 
 intel_root="$HOME/intel"
 
 working_directory="$(pwd)"
-log_dir="$working_directory/logs"
+log_dir="$working_directory/logs-${inspector_analysis}"
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 this_script="${script_dir}/$(basename "${BASH_SOURCE[0]}")"
@@ -39,6 +40,9 @@ Where OPTION is:
       Do not run the tests compiled with memory Sanitizer.
   --skip-valgrind
       Do not run the tests via Valgrind.
+  --inspector-analysis=[ mi2, mi3 ]
+      Run the given analysis with Intel Inspector.
+      Default is $inspector_analysis.
 EOF
 }
 
@@ -77,6 +81,7 @@ function check_failure()
 
     local success
     local error
+    local failure=2
 
     if [[ "$1" == "--no-problem" ]]
     then
@@ -92,12 +97,17 @@ function check_failure()
 
     mkdir -p "$log_dir/$tag"
 
+    local log_file="$log_dir/$tag/$program_name.log"
+
     # Disable default checks from malloc() as we want them to be
     # detected by the tool instead.
-    if MALLOC_CHECK_=0 "${launcher[@]}" "$@" \
-       &> "$log_dir/$tag/$program_name.log"
+    if MALLOC_CHECK_=0 "${launcher[@]}" "$@" &> "$log_file"
     then
         echo -e "$program_name $success"
+    elif grep --quiet --max-count 1 'Run terminated abnormally' "$log_file"
+    then
+        # Sometimes Inspector fails.
+        echo -e "$program_name $failure"
     else
         echo -e "$program_name $error"
     fi
@@ -165,7 +175,7 @@ function run_all_inspector_tests()
     local inspector
     inspector="$(echo "$inspector_path_prefix"*"$version"/bin64/inspxe-cl)"
 
-    local args=(-knob analyze-stack=true)
+    local args=()
 
     if [[ "$version" -ge 2019 ]]
     then
@@ -174,11 +184,16 @@ function run_all_inspector_tests()
         args+=(-knob detect-uninit-read=true)
     fi
 
+    if [[ "$inspector_analysis" == "mi3" ]]
+    then
+        args+=(-knob analyze-stack=true)
+    fi
+
     echo "Inspector $version"
     (
         echo "== Inspector $version =="
         run_tests inspector-"$version" "$inspector" \
-                  -collect mi3 \
+                  -collect "$inspector_analysis" \
                   "${args[@]}" \
 
     ) > "$log_dir/inspector-$version.log"
@@ -276,10 +291,11 @@ do
         --skip-valgrind)
             run_valgrind=0
             ;;
+        --inspector-analysis=*)
+            inspector_analysis="${arg#--inspector-analysis=}"
+            ;;
         --inspector-*)
-            cd "$script_dir/build/default"
-            run_all_inspector_tests "${arg#--inspector-}"
-            exit
+            run_inspector_only="${arg#--inspector-}"
             ;;
         *)
             echo "Unhandled argument: '$arg'." >&2
@@ -287,8 +303,16 @@ do
     esac
 done
 
-mkdir -p "$log_dir"
+if [ -n "$run_inspector_only" ]
+then
+    # This case should only occur from a recursive instantiation, thus
+    # we can assume that the setup is done.
+    cd "$script_dir/build/default"
+    run_all_inspector_tests "$run_inspector_only"
+else
+    mkdir -p "$log_dir"
 
-cd "$script_dir/build"
+    cd "$script_dir/build"
 
-run_all_tests
+    run_all_tests
+fi
