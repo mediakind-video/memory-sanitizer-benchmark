@@ -189,6 +189,12 @@ function run_all_inspector_tests()
     local inspector
     inspector="$(echo "$inspector_path_prefix"*"$version"/bin64/inspxe-cl)"
 
+    if [[ ! -f "$inspector" ]]
+    then
+        echo "Skipping inspector $version"
+        return 0
+    fi
+
     local args=()
 
     if [[ "$version" -ge 2019 ]]
