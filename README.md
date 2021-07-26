@@ -8,7 +8,8 @@ The test process goes in three steps:
   3. run `./format-logs.sh` to display the test results in a nice
      format.
 
-Pass `--help` to any script to get more details.
+Pass `--help` to any script to get more details. Pipe the output of
+`./format-logs.sh` to disable the fancy output.
 
 All tested programs either contain an intentional memory access error,
 which should be detected by the sanitizer, or an operation known to be
@@ -18,7 +19,7 @@ The tested sanitizers are:
 
   - Address Sanitizer, enabled via the `-fsanitize=address` of either
     GCC or Clang (whichever is the default compiler).
-  - Memory Sanitizer, enabled via the -fsanitize=memory` of Clang.
+  - Memory Sanitizer, enabled via the `-fsanitize=memory` of Clang.
   - Valgrind,
   - Intel Inspector, from version 2016 to 2020.
 
