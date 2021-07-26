@@ -21,5 +21,6 @@ int main(int argc, char** argv)
 
     // Reading from a bit that has never been set.
     printf("%d\n", get_bit(array, argc - 1));
+    free(array);
     return 0;
 }
