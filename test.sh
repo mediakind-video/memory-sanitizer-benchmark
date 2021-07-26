@@ -100,7 +100,8 @@ function check_failure()
 
     # Disable default checks from malloc() as we want them to be
     # detected by the tool instead.
-    if MALLOC_CHECK_=0 "${launcher[@]}" "$@" &> "$log_file"
+    if ASAN_OPTIONS=detect_stack_use_after_return=1 MALLOC_CHECK_=0 \
+                   "${launcher[@]}" "$@" &> "$log_file"
     then
         echo -e "$program_name $success"
     elif grep --quiet --max-count 1 'Run terminated abnormally' "$log_file"
@@ -136,12 +137,16 @@ function run_tests()
     "${command[@]}" ./alloc-missing-delete-array 1 2
     "${command[@]}" ./alloc-missing-free 1 2
 
+    "${command[@]}" ./oob-read-global-after-end 1 2 3 4
+    "${command[@]}" ./oob-read-global-before-begin
     "${command[@]}" ./oob-read-heap-after-end 1 2 3 4
     "${command[@]}" ./oob-read-heap-before-begin
     "${command[@]}" ./oob-read-stack-after-end 1 2 3 4
     "${command[@]}" ./oob-read-stack-before-begin
     "${command[@]}" ./oob-read-struct-next-field 1 2 3 4
 
+    "${command[@]}" ./oob-write-global-after-end 1 2 3 4
+    "${command[@]}" ./oob-write-global-before-begin
     "${command[@]}" ./oob-write-heap-after-end 1 2 3 4
     "${command[@]}" ./oob-write-heap-before-begin
     "${command[@]}" ./oob-write-stack-after-end 1 2 3 4
@@ -152,6 +157,8 @@ function run_tests()
     "${command[@]}" ./uninit-read-heap-variable 1 2
     "${command[@]}" ./uninit-read-malloc-variable 1 2
     "${command[@]}" ./uninit-read-stack-variable 1 2
+
+    "${command[@]}" ./misc-stack-use-after-return
 
     "${command[@]}" --no-problem ./pass-simd 1
 

@@ -48,6 +48,8 @@ foreach(file
 endforeach()
 
 foreach(file
+    global-after-end.cpp
+    global-before-begin.cpp
     heap-after-end.cpp
     heap-before-begin.cpp
     stack-after-end.cpp
@@ -65,6 +67,12 @@ foreach(file
     stack-variable.cpp
     )
   add_test_executable(uninit-read- "src/uninitialized-read/${file}")
+endforeach()
+
+foreach(file
+    stack-use-after-return.cpp
+    )
+  add_test_executable(misc- "src/misc/${file}")
 endforeach()
 
 foreach(file
