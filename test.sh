@@ -16,7 +16,6 @@ inspector_analysis=mi2
 intel_root="$HOME/intel"
 
 working_directory="$(pwd)"
-log_dir="$working_directory/logs-${inspector_analysis}"
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
 this_script="${script_dir}/$(basename "${BASH_SOURCE[0]}")"
@@ -276,7 +275,9 @@ function run_all_tests()
 
             for version in 2016 2017 2018 2019 2020
             do
-                "$this_script" --inspector-"$version" &
+                "$this_script" \
+                    --inspector-"$version" \
+                    --inspector-analysis="$inspector_analysis" &
                 pids+=($!)
             done
 
@@ -323,6 +324,8 @@ do
             exit 1
     esac
 done
+
+log_dir="$working_directory/logs-${inspector_analysis}"
 
 if [[ -n "$run_inspector_only" ]]
 then
