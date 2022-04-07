@@ -25,3 +25,5 @@ The tested sanitizers are:
 
 The versions of Inspector are expected to be installed in
 `$HOME/intel/$year`.
+
+**[See the results](./docs/analysis.md)**
