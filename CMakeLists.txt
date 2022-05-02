@@ -53,7 +53,9 @@ foreach(file
     heap-after-end.cpp
     heap-before-begin.cpp
     stack-after-end.cpp
+    stack-after-end-consecutive.cpp
     stack-before-begin.cpp
+    stack-before-begin-consecutive.cpp
     struct-next-field.cpp
     )
   add_test_executable(oob-read- "src/out-of-bounds-read/${file}")

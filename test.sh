@@ -142,7 +142,9 @@ function run_tests()
     "${command[@]}" ./oob-read-heap-after-end 1 2 3 4
     "${command[@]}" ./oob-read-heap-before-begin
     "${command[@]}" ./oob-read-stack-after-end 1 2 3 4
+    "${command[@]}" ./oob-read-stack-after-end-consecutive 1 2 3 4
     "${command[@]}" ./oob-read-stack-before-begin
+    "${command[@]}" ./oob-read-stack-before-begin-consecutive
     "${command[@]}" ./oob-read-struct-next-field 1 2 3 4
 
     "${command[@]}" ./oob-write-global-after-end 1 2 3 4
@@ -150,7 +152,9 @@ function run_tests()
     "${command[@]}" ./oob-write-heap-after-end 1 2 3 4
     "${command[@]}" ./oob-write-heap-before-begin
     "${command[@]}" ./oob-write-stack-after-end 1 2 3 4
+    "${command[@]}" ./oob-write-stack-after-end-consecutive 1 2 3 4
     "${command[@]}" ./oob-write-stack-before-begin
+    "${command[@]}" ./oob-write-stack-before-begin-consecutive
     "${command[@]}" ./oob-write-struct-next-field 1 2 3 4
 
     "${command[@]}" ./uninit-read-bit 1 2
